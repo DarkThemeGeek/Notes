@@ -124,13 +124,23 @@ def frequency(sentence: str) -> dict:
         else :
             counter[x]+=1
     return counter
-print(frequency(input("Enter sentence: ")))
+#print(frequency(input("Enter sentence: ")))
 
 """
 6. Write a function that checks if two words are anagrams of each other by comparing letter frequencies using a dictionary.
 """
-
-
+def check_anagrams(word1:str, word2:str)->bool :
+    anagram_dict1 = {}
+    for letter in word1:
+        if  not anagram_dict1.__contains__(letter):
+            anagram_dict1.update({letter: word1.count(letter)})
+    for letter in word2:
+        if  not anagram_dict1.__contains__(letter):
+            return False
+        if anagram_dict1[letter] != word2.count(letter):
+            return False
+    return True
+print(check_anagrams(input(), input()))
 """
 7. Read pairs of student names and grades until the user enters "done". Store them in a dictionary with the student name 
     as key and a list of grades as value. Then compute:
