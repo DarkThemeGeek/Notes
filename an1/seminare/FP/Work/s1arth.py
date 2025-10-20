@@ -140,11 +140,68 @@ def check_anagrams(word1:str, word2:str)->bool :
         if anagram_dict1[letter] != word2.count(letter):
             return False
     return True
-print(check_anagrams(input(), input()))
+#print(check_anagrams(input(), input()))
 """
 7. Read pairs of student names and grades until the user enters "done". Store them in a dictionary with the student name 
     as key and a list of grades as value. Then compute:
     - average grade per student,
     - overall average,
     - the top student(s). To be in contention for "top student", students must have at least 3 grades
+"""
+"""
+def read_students()->dict:
+    students = {}
+    while True:
+        a=[]
+        a=input().split()
+        if students.__contains__(a[0]):
+            students[a[0]].__add__((*float(a[1]),))
+        else:
+            students={a[0]:()}
+            students[a[0]].__add__((float(a[1]),))
+        if a == "done":
+            return students
+
+
+
+def average_grade_per_student(students:dict) -> dict:
+    average_students={}
+    for student in students:
+        average_students[student] = sum(students[student]) / len(students[student])
+    return average_students
+def average_grade(students_average:dict) -> float:
+    average=0
+
+    for student in students_average:
+       average+=students_average[student]
+
+    average=average/len(students_average)
+
+    return average
+
+def top_student(students_average:dict,number_of_grades:dict) -> list:
+    max=-1
+    top_students=[]
+    for student in students_average:
+        if students_average[student] > max and number_of_grades[student] >= 3:
+            max=students_average[student]
+    for student in students_average:
+        if students_average[student] == max and number_of_grades[student] >= 3:
+            top_students.append(student)
+    return top_students
+
+def nr_grades(stud:dict)->dict:
+    nr_grades={}
+    for student in stud:
+        nr_grades[student]=stud[student].count()
+    return
+def do_logic():
+    students=read_students()
+    avr=average_grade_per_student()
+
+    print(avr)
+    print(average_grade(avr))
+    print(top_student(avr,nr_grades(students)))
+    return
+do_logic()
 """
