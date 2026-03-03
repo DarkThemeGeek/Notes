@@ -1,0 +1,63 @@
+     1                                  bits 32 ; assembling for the 32 bits architecture
+     2                                  
+     3                                  ; declare the EntryPoint (a label defining the very first instruction of the program)
+     4                                  global start        
+     5                                  
+     6                                  ; declare external functions needed by our program
+     7                                  extern exit               ; tell nasm that exit exists even if we won't be defining it
+     8                                  import exit msvcrt.dll    ; exit is a function that ends the calling process. It is defined in msvcrt.dll
+     9                                                            ; msvcrt.dll contains exit, printf and all the other important C-runtime specific functions
+    10                                                            
+    11                                                            
+    12                                  ;EFLAGS <reg32>
+    13                                  ;CF
+    14                                  ;OF -overflow flag (signed carry) if you add 2 negative or positive numbers and the signed bit changes OF=1
+    15                                  ;SF -signed flag SF=sign bit of last result 
+    16                                  ;ZF -zero flag signals if the last result was 0
+    17                                  ;uselss flags
+    18                                  ;PF -parity flag
+    19                                  ;-------------------------------------------------------
+    20                                  ;-------------------------------------------------------
+    21                                  ;Instructions
+    22                                  ;CMP compare CMP op1,op2 op reg,var,imediate rules of mov
+    23                                  ;fake subtraction
+    24                                  ;only eflags are changed 
+    25                                  ;test 
+    26                                  ;(changeing eflags by and )
+    27                                  ;"fake and"
+    28                                  ;jump instructions
+    29                                  ;EIP=the adress of the next instruction to be executed by the cpu
+    30                                  ;labels
+    31                                  ; name :
+    32                                  
+    33                                  ;unconditianal jump
+    34                                  ;jmp label
+    35                                  
+    36                                  ;conditional jmp perform change eip based on eflags 
+    37                                  ;je label jz label (ZF=1)
+    38                                  ;
+    39                                  ;
+    40                                  ; our data is declared here (the variables needed by our program)
+    41                                  segment data use32 class=data
+    42                                      ; ...
+    43 00000000 0500                        a dw 5
+    44 00000002 02                          b db 2
+    45                                      
+    46                                  ; our code starts here
+    47                                  segment code use32 class=code
+    48                                  
+    49                                      start:
+    50 00000000 A1[00000000]                    mov eax,[a]
+    51 00000005 8B1D[02000000]                  mov ebx ,[b]
+    52 0000000B 39D8                            cmp eax,ebx
+    53 0000000D 740A                            jz equal
+    54 0000000F EB0E                            jmp not_equal
+    55                                          
+    56                                          
+    57                                          
+    58 00000011 6A00                            push    dword 0      ; push the parameter for exit onto the stack
+    59 00000013 FF15[00000000]                  call    [exit]       ; call exit to terminate the program
+    60                                    equal:
+    61 00000019 011D[00000000]                  add [a],ebx
+    62                                    not_equal:
+    63 0000001F 291D[00000000]                  sub [a],ebx

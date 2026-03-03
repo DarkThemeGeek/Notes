@@ -1,0 +1,94 @@
+     1                                  bits 32 ; assembling for the 32 bits architecture
+     2                                  
+     3                                  ; declare the EntryPoint (a label defining the very first instruction of the program)
+     4                                  global start        
+     5                                  
+     6                                  ; declare external functions needed by our program
+     7                                  extern exit 
+     8                                  extern printf              ; tell nasm that exit exists even if we won't be defining it
+     9                                  import exit msvcrt.dll  
+    10                                  import printf msvcrt  ; exit is a function that ends the calling process. It is defined in msvcrt.dll
+    11                                                            ; msvcrt.dll contains exit, printf and all the other important C-runtime specific functions
+    12                                  ;printf/scanf
+    13                                  ;printf(format ,)
+    14                                  ;"%d" int
+    15                                  ;"%u" uint
+    16                                  ; "%s string
+    17                                  ;"%c character
+    18                                  ;%x  - hexadecimal base 16
+    19                                  ;%o -octal byte 
+    20                                  ; our data is declared here (the variables needed by our program)
+    21                                  ;ss== stack segment
+    22                                  ;push op
+    23                                  ;sub esp, 4/2
+    24                                  ;mov ss:[esp],op
+    25                                  ;pop op
+    26                                  ;mov op,ss:[esp}
+    27                                  ;add esp 4/2
+    28                                  ;esp<-top  | lower
+    29                                  ;ebp<-base | higher
+    30                                  
+    31                                  ;-CALL op 
+    32                                  ;EIP=adress given by op
+    33                                  ;EIP return
+    34                                  
+    35                                  ;ret
+    36                                  ;EiP=[ESP]
+    37                                  ;add esp,4
+    38                                  
+    39                                  ;import prinft msvcrt.dll
+    40                                  ;extern printf ->directive
+    41                                  
+    42                                  ;calling conventions
+    43                                  ;whre is the return value
+    44                                  ;what registers can be changed by the function
+    45                                  ;whose responsability it is to free the parameters
+    46                                  ;how are the parameters passed to the function
+    47                                  
+    48                                  ;calling conventions for msvcrt
+    49                                  ;the return value is stored on eax
+    50                                  ;the registers eax,ecx,edx volatile registers
+    51                                  ;the paramters should be freed by the caller
+    52                                  ;the paramters are passed on the stack in reverse order
+    53                                  ;printf(
+    54                                  ; external function: call[printf]
+    55                                  ; internal function call label
+    56                                  
+    57                                  ;push EBP
+    58                                  ;mov EBP,ESP
+    59                                  ;mov eax,[ebp+8]
+    60                                  segment data use32 class=data
+    61 00000000 01000000                   c dd 1
+    62 00000004 02000000                   b dd 2
+    63 00000008 00000000                   a dd 0
+    64 0000000C 53756D206F66202564-        message dd "Sum of %d + %d =%d",0
+    64 00000015 202B202564203D2564-
+    64 0000001E 000000000000       
+    65                                  
+    66                                     
+    67                                      
+    68                                  ; 0    
+    69                                  ; ----------------------=
+    70                                  ; |code|heap ->|<- stack|
+    71                                  ; ----------------------=
+    72                                  ; our code starts here
+    73                                  segment code use32 class=code
+    74                                      start:
+    75 00000000 A1[00000000]                    mov eax,[c]
+    76 00000005 0305[04000000]                  add eax,[b]
+    77 0000000B A3[08000000]                    mov [a],eax
+    78 00000010 B903000000                      mov ecx,3
+    79 00000015 51                              push ecx
+    80                                          repeat_1:
+    81 00000016 FF35[08000000]                  push dword[a]
+    82 0000001C FF35[00000000]                  push dword[c]
+    83 00000022 FF35[04000000]                  push dword[b]
+    84 00000028 68[0C000000]                    push message
+    85 0000002D FF15[00000000]                  call [printf]
+    86 00000033 83C410                          add esp,4*4
+    87 00000036 59                              pop ecx
+    88 00000037 E2DD                            loop repeat_1
+    89                                   
+    90                                          ; exit(0)
+    91 00000039 6A00                            push    dword 0      ; push the parameter for exit onto the stack
+    92 0000003B FF15[00000000]                  call    [exit]       ; call exit to terminate the program

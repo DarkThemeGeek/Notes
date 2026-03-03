@@ -1,0 +1,91 @@
+     1                                  bits 32
+     2                                  global start        
+     3                                  extern exit             
+     4                                  import exit msvcrt.dll    
+     5                                                            
+     6                                  segment data use32 class=data
+     7                                      ; merge 2 sorted lists a and b given as input
+     8 00000000 E7FFF6FF000000000A-         a dw -25, -10, 0, 0, 10, 100, 300
+     8 00000009 0064002C01         
+     9                                      len1 equ ($-a) / 2
+    10 0000000E E2FF00000100020003-         b dw -30, 0, 1, 2, 3, 150
+    10 00000017 009600             
+    11                                      len2 equ ($-b) / 2
+    12 0000001A <res 0000001A>              result resw len1 + len2
+    13                                      ; in this example, result = -30, -25, -10, 0, 0, 0, 1, 2, 3, 10, 100, 150, 300
+    14                                  
+    15                                  segment code use32 class=code
+    16                                      start:
+    17 00000000 BF[1A000000]                    mov edi ,result
+    18 00000005 B9[00000000]                    mov ecx ,a
+    19 0000000A BB[0E000000]                    mov ebx ,b
+    20                                          
+    21 0000000F B807000000                      mov eax,len1
+    22 00000014 83F800                          cmp eax , 0
+    23 00000017 7446                                je end
+    24                                          
+    25 00000019 B806000000                      mov eax,len2
+    26 0000001E 83F800                          cmp eax , 0
+    27 00000021 743C                                je end
+    28                                          
+    29                                          while_loop:
+    30                                          
+    31 00000023 81F9[0E000000]                  cmp ecx, len1*2 + a
+    32 00000029 7D13                                jge exit_loop
+    33                                              
+    34 0000002B 81FB[1A000000]                  cmp ebx, len2*2 + b
+    35 00000031 7D0B                                jge exit_loop
+    36                                          
+    37 00000033 89CE                            mov esi,ecx
+    38 00000035 66AD                            lodsw ;ax<-a
+    39                                          
+    40 00000037 663B03                          cmp ax,[ebx]
+    41 0000003A 7C2B                                jl mov_a_to_result
+    42                                          
+    43 0000003C EB2F                                jmp mov_b_to_result
+    44                                          exit_loop:
+    45                                          
+    46                                         loop_rem_a:
+    47 0000003E 81F9[0E000000]                 cmp ecx, len1*2 + a
+    48 00000044 7D19                           jge loop_rem_exit
+    49 00000046 89CE                           mov esi,ecx
+    50 00000048 66A5                           movsw
+    51 0000004A 41                             inc ecx
+    52 0000004B 41                             inc ecx
+    53 0000004C EBF0                           jmp loop_rem_a
+    54                                         
+    55                                         loop_rem_b:
+    56 0000004E 81FB[1A000000]                 cmp ebx, len2*2 + b
+    57 00000054 7D09                           jge loop_rem_exit
+    58 00000056 668B03                         mov ax,[ebx]
+    59 00000059 66AB                           stosw
+    60 0000005B 43                             inc ebx
+    61 0000005C 43                             inc ebx
+    62 0000005D EBEF                           jmp loop_rem_b
+    63                                         
+    64                                          
+    65                                          loop_rem_exit:
+    66                                          
+    67                                          ; exit(0)
+    68                                          
+    69                                          end:
+    70                                          
+    71 0000005F 6A00                            push    dword 0      ; push the parameter for exit onto the stack
+    72 00000061 FF15[00000000]                  call    [exit]       ; call exit to terminate the program   
+    73                                          
+    74                                          mov_a_to_result:
+    75 00000067 66AB                            stosw
+    76                                          
+    77 00000069 41                              inc ecx
+    78 0000006A 41                              inc ecx
+    79                                          
+    80 0000006B EBB6                            jmp while_loop
+    81                                          
+    82                                          mov_b_to_result:
+    83 0000006D 668B03                          mov ax,[ebx]
+    84 00000070 66AB                            stosw 
+    85                                          
+    86 00000072 43                              inc ebx
+    87 00000073 43                              inc ebx
+    88                                          
+    89 00000074 EBAD                            jmp while_loop

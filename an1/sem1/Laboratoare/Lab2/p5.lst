@@ -1,0 +1,44 @@
+     1                                  bits 32
+     2                                  global start
+     3                                  extern exit
+     4                                  import exit msvcrt.dll
+     5                                  ;(f*g-a*b*e)/(h+c*d)
+     6                                  segment data use32 class=Data
+     7                                  
+     8 00000000 03                      a db 3
+     9 00000001 05                      b db 5
+    10 00000002 06                      c db 6
+    11 00000003 07                      d db 7
+    12                                  
+    13 00000004 0100                    e dw 1 
+    14 00000006 0200                    f dw 2
+    15 00000008 0300                    g dw 3 
+    16 0000000A 0400                    h dw 4
+    17                                  
+    18 0000000C 00000000                temp1 dd 0
+    19                                  segment code use32 class=code
+    20                                  
+    21                                  start:
+    22 00000000 66A1[06000000]          mov ax,[f]
+    23 00000006 66F725[08000000]        mul word[g]
+    24 0000000D 6652                    push dx
+    25 0000000F 6650                    push ax
+    26 00000011 8F05[0C000000]          pop dword[temp1];temp1<-f*g
+    27                                  
+    28 00000017 A0[00000000]            mov al,[a]
+    29 0000001C F625[01000000]          mul byte[b];ax<-a*b
+    30 00000022 66F725[04000000]        mul word[e]
+    31 00000029 6652                    push dx
+    32 0000002B 6650                    push ax
+    33 0000002D 5B                      pop ebx;ebx<-a*b*e
+    34                                  
+    35 0000002E 291D[0C000000]          sub dword[temp1],ebx;(f*g-a*b*e)
+    36 00000034 A0[02000000]            mov al,[c]
+    37 00000039 F625[03000000]          mul byte[d];c*d
+    38 0000003F 660305[0A000000]        add ax,[h];h+c*d
+    39 00000046 98                      CWDE 
+    40 00000047 29C3                    sub ebx,eax;ebx-<f*g-a*b*e)-(h+c*d)
+    41                                  
+    42 00000049 6A00                    push dword 0
+    43                                  
+    44 0000004B FF15[00000000]          call[exit]

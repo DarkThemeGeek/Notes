@@ -1,0 +1,23 @@
+{
+    "configurations": [
+        {
+            "name": "Win32",
+            "includePath": [
+            "${workspaceFolder}/**",
+            "C:/MinGW/include",
+            "C:/MinGW/lib/gcc/i686-w64-mingw32/*/include",
+            "C:/MinGW/i686-w64-mingw32/include"
+        ],
+            "defines": [
+                "_DEBUG",
+                "UNICODE",
+                "_UNICODE"
+            ],
+            "compilerPath": "C:/MinGW/bin/gcc.exe",
+            "cStandard": "c17",
+            "cppStandard": "c++17",
+            "intelliSenseMode": "windows-msvc-x64"
+        }
+    ],
+    "version": 4
+}

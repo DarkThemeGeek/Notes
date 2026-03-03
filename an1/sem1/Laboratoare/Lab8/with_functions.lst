@@ -1,0 +1,112 @@
+     1                                  bits 32 
+     2                                  
+     3                                  global start        
+     4                                  
+     5                                  extern exit
+     6                                  extern fopen
+     7                                  extern printf
+     8                                  extern fread
+     9                                  
+    10                                  import exit msvcrt.dll
+    11                                  import fopen msvcrt.dll
+    12                                  import printf msvcrt.dll
+    13                                  import fread msvcrt.dll
+    14                                  
+    15                                  segment data use32 class=data
+    16                                      
+    17 00000000 4E6F772C2068657265-         text db "Now, here you go again, You say you want your freedom, Well, who am I to keep you down?",0
+    17 00000009 20796F7520676F2061-
+    17 00000012 6761696E2C20596F75-
+    17 0000001B 2073617920796F7520-
+    17 00000024 77616E7420796F7572-
+    17 0000002D 2066726565646F6D2C-
+    17 00000036 2057656C6C2C207768-
+    17 0000003F 6F20616D204920746F-
+    17 00000048 206B65657020796F75-
+    17 00000051 20646F776E3F00     
+    18                                      len equ $ - text
+    19 00000058 00000000                    result dd 0
+    20 0000005C 66696C652E696E0000-         filename dd "file.in",0
+    20 00000065 000000             
+    21 00000068 00000000                    FilePointer dd 0
+    22 0000006C 72000000                    r dd "r"
+    23 00000070 <res 000003E8>              textBuffer resb 1000
+    24                                      
+    25                                  
+    26                                  segment code use32 class=code
+    27                                      start:
+    28                                          ;mov ECX, len
+    29 00000000 FF35[6C000000]                  push dword[r]
+    30 00000006 FF35[5C000000]                  push dword[filename]
+    31 0000000C FF15[00000000]                  call[fopen]
+    32 00000012 A3[68000000]                    mov [FilePointer],eax
+    33 00000017 83C608                          add esi,4*2
+    34                                          
+    35 0000001A 68[68000000]                    push dword FilePointer
+    36 0000001F 6A01                            push dword 1
+    37 00000021 68E8030000                      push dword 1000
+    38 00000026 68[70000000]                    push textBuffer
+    39 0000002B FF15[00000000]                  call[fread]
+    40 00000031 83C610                          add esi, 4*4
+    41 00000034 A358000000                      mov [len],eax
+    42 00000039 89C1                            mov Ecx,eax
+    43                                          ;jecxz skip_code
+    44                                          ;condition in case of 0 case
+    45                                          
+    46                                          ;moving the adress of the string into edi
+    47                                          
+    48 0000003B BF[70000000]                    mov EDI, textBuffer 
+    49                                          ;mov BL, 0
+    50                                          
+    51                                          loop_start:
+    52                                          
+    53                                          ;stosd
+    54 00000040 AA                              stosb
+    55                                          
+    56 00000041 3C20                            cmp AL ,' '
+    57 00000043 7439                            JE space
+    58                                          
+    59 00000045 3C61                            cmp AL, 'a'
+    60 00000047 7D04                            jge starts_small_char
+    61                                          
+    62 00000049 3C41                            cmp AL, 'A'
+    63 0000004B 7D06                            jge starts_big_char
+    64                                          
+    65                                          starts_small_char:
+    66 0000004D 3C7A                            cmp AL, 'z'
+    67 0000004F 7E0F                            jle end_if_statements 
+    68                                          
+    69 00000051 EB06                            jmp is_character
+    70                                          
+    71                                          starts_big_char:
+    72 00000053 3C5A                            cmp AL, 'Z'
+    73 00000055 7D09                            jge end_if_statements 
+    74                                          
+    75 00000057 EB00                            jmp is_character
+    76                                          
+    77                                          is_character:
+    78                                          ;mov BL, 1
+    79 00000059 BB00000000                      mov ebx,0
+    80                                          
+    81 0000005E EB00                            jmp skip_if 
+    82                                          
+    83                                          end_if_statements:
+    84                                          ;mov BL, 0
+    85                                          skip_if:
+    86 00000060 EBDE                            jmp loop_start
+    87                                          loop_end:
+    88                                         ; mov BL, 0
+    89                                          skip_code:
+    90                                          
+    91 00000062 B8[58000000]                    mov eax,result
+    92 00000067 50                              push eax
+    93 00000068 6825640000                      push "%d"
+    94 0000006D FF15[00000000]                  call [printf]
+    95 00000073 83C608                          add esi,4*2
+    96                                          ; exit(0)
+    97 00000076 6A00                            push    dword 0      ; push the parameter for exit onto the stack
+    98 00000078 FF15[00000000]                  call    [exit]       ; call exit to terminate the program
+    99                                  
+   100                                          space:
+   101 0000007E 011D[58000000]                      add [result],ebx
+   102 00000084 EBBA                            jmp loop_start

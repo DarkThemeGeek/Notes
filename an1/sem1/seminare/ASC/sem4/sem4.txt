@@ -1,0 +1,21 @@
+loop ecx
+dec ecx
+cmp ecx,0
+jnz label
+
+stosb 
+al->[edi]
++-1
+ax->[edi]
++-2
+eax->[edi]
+_+4
+movs mem to mem
+
+movsb 
+movsw esi->edi
+movsd
+
+;scasb cmpal ds,al
+ cmp ax,ds
+ cmp eax,edx

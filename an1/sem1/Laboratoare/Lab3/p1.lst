@@ -1,0 +1,29 @@
+     1                                  bits 32
+     2                                  
+     3                                  global start
+     4                                  extern ExitProcess, printf
+     5                                  import ExitProcess kernel32.dll
+     6                                  import printf msvcrt.dll
+     7                                  
+     8                                  segment code use32 class=CODE
+     9                                  
+    10                                  ;[-1+d-2*(b+1)]/a
+    11                                  start:
+    12                                  
+    13 00000000 A0[03000000]               mov al,[b]
+    14 00000005 0401                       add al,1
+    15 00000007 B302                       mov bl,2
+    16 00000009 F6E3                       mul bl;ax<-2*(b+1)
+    17 0000000B 662905[01000000]           sub word[d],ax
+    18 00000012 66A1[01000000]             mov ax,[d]
+    19 00000018 6683E801                   sub ax,1
+    20 0000001C F635[00000000]             div byte[a]
+    21                                  
+    22 00000022 6A00                        push dword 0
+    23 00000024 FF15[00000000]              call [ExitProcess]
+    24                                  
+    25                                  
+    26                                  segment data use32 class=DATA
+    27 00000000 0A                      a db 10
+    28 00000001 0A00                    d dw 10
+    29 00000003 01                      b db 1   

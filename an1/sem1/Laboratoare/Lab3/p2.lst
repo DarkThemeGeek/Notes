@@ -1,0 +1,42 @@
+     1                                  ;Multiplications, divisions
+     2                                  ;a,b,c - byte, d - word
+     3                                  ;d-[3*(a+b+2)-5*(c+2)]
+     4                                  
+     5                                  bits 32
+     6                                  global start
+     7                                  extern exit
+     8                                  import exit msvcrt.dll
+     9                                  
+    10                                  segment data use32 class=Data
+    11 00000000 FD                      a db -3
+    12 00000001 0A000000                b dd 10
+    13 00000005 05000000                c dd 5
+    14 00000009 0700                    d dw 7
+    15                                  segment code use32 class=code
+    16                                  ;c+(a*a-b+7)/(2+a); a-byte b dd c dd
+    17                                  start:
+    18 00000000 A0[00000000]            mov al,[a]
+    19 00000005 F62D[00000000]          imul byte[a]
+    20 0000000B 98                      CWDE ; cbw cwd ax->dx:ax cwdea ax->eax cdq
+    21 0000000C 2B05[01000000]          sub eax,[b]
+    22 00000012 83C007                  add eax,7;c+(a*a-b+7)
+    23 00000015 89C3                    mov ebx,eax 
+    24                                  
+    25 00000017 A0[00000000]            mov al,[a]
+    26 0000001C B002                    mov al,2
+    27                                  
+    28 0000001E 6698                    CBW
+    29 00000020 98                      CWDE
+    30                                  ; eax <-(2-a) dword
+    31 00000021 89C1                    mov ecx,eax
+    32 00000023 89D8                    mov eax,ebx
+    33                                  
+    34                                  
+    35 00000025 99                      CDQ
+    36                                  
+    37 00000026 F7F9                    IDIV Ecx
+    38                                  
+    39 00000028 0305[05000000]          add eax,[c]
+    40 0000002E 6A00                    push dword 0
+    41 00000030 FF15[00000000]          call[exit]
+    42                                  ;ctrl-shift-n for copy paste template stuff

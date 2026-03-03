@@ -1,0 +1,53 @@
+     1                                  bits 32
+     2                                  global start        
+     3                                  extern exit             
+     4                                  import exit msvcrt.dll  
+     5                                  
+     6                                  ; TASK: Two character strings S1 and S2 are given. Obtain the string D which contains all the elements of S1 that do not appear in S2.
+     7                                  ; S1: '+', '4', '2', 'a', '8', '4', 'X', '5'
+     8                                  ; S2: 'a', '4', '5'
+     9                                  ; D: '+', '2', '8', 'X'
+    10                                  
+    11                                  ; read for more efficient implementations: https://softwareengineering.stackexchange.com/questions/280361/list-comparing-techniques-for-faster-performance
+    12                                                            
+    13                                  segment data use32 class=data
+    14 00000000 2B34326138345835        arr1 db '+', '4', '2', 'a', '8', '4', 'X', '5'
+    15 00000008 613435                  arr2 db "a45"
+    16                                  len1 equ arr2-arr1
+    17                                  len2 equ $-arr2
+    18 0000000B <res 00000008>          d resb len1
+    19                                  
+    20                                  segment code use32 class=code
+    21                                      start:
+    22 00000000 BE00000000                  mov esi,0 ;i
+    23 00000005 B900000000                  mov ecx,0 ;j
+    24 0000000A BF00000000                  mov edi,0;counter
+    25                                      start_loop1:
+    26 0000000F 83FE07                          cmp esi ,len1-1
+    27 00000012 7425                            jz  exit_loop
+    28 00000014 46                              inc esi
+    29                                          start_loop2:
+    30 00000015 39F1                                cmp ecx,esi
+    31 00000017 74F6                                jz  start_loop1
+    32                                              
+    33 00000019 8B91[08000000]                      mov edx,[arr2+ecx]
+    34                                              
+    35 0000001F 3996[00000000]                      cmp [arr1+esi],edx
+    36                                              
+    37 00000025 740D                                je jump_adding_value
+    38 00000027 8B96[00000000]                      mov edx,[arr1+esi]
+    39 0000002D 8997[0B000000]                      mov [d+edi],edx
+    40 00000033 47                                  inc edi
+    41                                              jump_adding_value:
+    42                                              
+    43 00000034 41                                  inc ecx
+    44 00000035 EBDE                            jmp start_loop2
+    45 00000037 EBDC                        jmp start_loop2
+    46                                  
+    47                                      
+    48                                              
+    49                                      exit_loop:
+    50                                      
+    51                                         
+    52 00000039 6A00                            push    dword 0      ; push the parameter for exit onto the stack
+    53 0000003B FF15[00000000]                  call    [exit]       ; call exit to terminate the program

@@ -1,0 +1,48 @@
+     1                                  bits 32 ; assembling for the 32 bits architecture
+     2                                  
+     3                                  ; declare the EntryPoint (a label defining the very first instruction of the program)
+     4                                  global start        
+     5                                  
+     6                                  ; declare external functions needed by our program
+     7                                  extern exit,scanf,printf           ; tell nasm that exit exists even if we won't be defining it
+     8                                  import exit msvcrt.dll    ; exit is a function that ends the calling process. It is defined in msvcrt.dll
+     9                                  import scanf msvcrt.dll
+    10                                  import printf msvcrt.dll      ; msvcrt.dll contains exit, printf and all the other important C-runtime specific functions
+    11                                  
+    12                                  ; our data is declared here (the variables needed by our program)
+    13                                  segment data use32 class=data
+    14 00000000 00000000                a dd 0
+    15 00000004 256400                  input_fromat db "%d",0
+    16 00000007 256400                  output_format db "%d",0
+    17                                  
+    18                                  ;read n output all numbers until 1
+    19                                  ;Call Label
+    20                                  ;RET
+    21                                  ; our code starts here
+    22                                  segment code use32 class=code
+    23                                      start:
+    24                                          ; ...
+    25 00000000 68[00000000]                    push a
+    26 00000005 68[04000000]                    push input_fromat
+    27 0000000A FF15[00000000]                  call [scanf]
+    28 00000010 83C408                          add esp,4*2
+    29                                          
+    30 00000013 030D[00000000]                  add ecx,[a]
+    31                                          
+    32 00000019 E319                            jecxz exit_label
+    33                                          
+    34                                          start_loop:
+    35 0000001B FF05[00000000]                  inc dword[a]
+    36                                          
+    37 00000021 FF35[00000000]                  push dword[a]
+    38 00000027 68[07000000]                    PUSH output_format
+    39                                          
+    40 0000002C FF15[00000000]                  call[printf]
+    41                                          
+    42 00000032 E2E7                            loop start_loop
+    43                                          
+    44                                          
+    45                                          ; exit(0)
+    46                                          exit_label:
+    47 00000034 6A00                            push    dword 0      ; push the parameter for exit onto the stack
+    48 00000036 FF15[00000000]                  call    [exit]       ; call exit to terminate the program

@@ -1,0 +1,51 @@
+     1                                  bits 32 ; assembling for the 32 bits architecture
+     2                                  
+     3                                  ; declare the EntryPoint (a label defining the very first instruction of the program)
+     4                                  global start        
+     5                                  
+     6                                  ; declare external functions needed by our program
+     7                                  extern exit               ; tell nasm that exit exists even if we won't be defining it
+     8                                  import exit msvcrt.dll    ; exit is a function that ends the calling process. It is defined in msvcrt.dll
+     9                                                            ; msvcrt.dll contains exit, printf and all the other important C-runtime specific functions
+    10                                  
+    11                                  ; our data is declared here (the variables needed by our program)
+    12                                  segment data use32 class=data
+    13 00000000 312034202D37203132-         a dd "1 4 -7 12 -5 3"
+    13 00000009 202D3520330000     
+    14                                      len equ ($-a)/4
+    15                                  
+    16                                  ; our code starts here
+    17                                  segment code use32 class=code
+    18                                      start:
+    19 00000000 BA01000000                      mov edx ,1
+    20                                          
+    21                                          repeat
+    21          ******************       warning: label alone on a line without a colon might be in error [-w+orphan-labels]
+    22 00000005 BA00000000                      mov edx ,0
+    23 0000000A BA03000000                      mov edx,len-1
+    24 0000000F BE04000000                      mov esi,len 
+    25 00000014 4A                              dec edx
+    26                                          repeat2:
+    27 00000015 AD                                  lodsd
+    28 00000016 89C3                                mov ebx,eax
+    29                                              lods
+    29          ******************       warning: label alone on a line without a colon might be in error [-w+orphan-labels]
+    30 00000018 39C3                                cmp ebx,eax
+    31 0000001A 7F0F                                jg swap
+    32                                              
+    33 0000001C EB05                                jmp out_label
+    34                                          
+    35                                         
+    36 0000001E 83FA00                          cmp edx,0
+    37 00000021 74E2                            je repeat
+    38                                          out_label:
+    39                                          ; exit(0)
+    40 00000023 6A00                            push    dword 0      ; push the parameter for exit onto the stack
+    41 00000025 FF15[00000000]                  call    [exit]         ; call exit to terminate the program
+    42                                          
+    43                                          swap:
+    44 0000002B 89F7                             mov edi,esi
+    45 0000002D 4F                               dec edi
+    46 0000002E 93                               xchg ebx,eax
+    47 0000002F AB                               stosd
+    48 00000030 EBD3                            jmp repeat

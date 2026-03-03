@@ -1,0 +1,50 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "Assemble ASM files",
+            "type": "shell",
+            "command": "cmd",
+            "args": [
+                "/c",
+                "for %f in (*.asm) do nasm -f win32 %f -o %~nf.obj"
+            ],
+            "problemMatcher": [],
+            "group": "build"
+        },
+        {
+            "label": "Compile CPP files",
+            "type": "shell",
+            "command": "cmd",
+            "args": [
+                "/c",
+                "g++ -m32 -c *.cpp"
+            ],
+            "problemMatcher": ["$gcc"],
+            "group": "build"
+        },
+        {
+            "label": "Link objects",
+            "type": "shell",
+            "command": "cmd",
+            "args": [
+                "/c",
+                "g++ -m32 -mconsole -o app.exe *.obj *.o"
+            ],
+            "problemMatcher": ["$gcc"],
+            "group": "build"
+        },
+        {
+            "label": "Build All",
+            "dependsOn": [
+                "Assemble ASM files",
+                "Compile CPP files",
+                "Link objects"
+            ],
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            }
+        }
+    ]
+}

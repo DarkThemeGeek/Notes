@@ -1,0 +1,93 @@
+     1                                  bits 32 
+     2                                  
+     3                                  global start        
+     4                                  
+     5                                  extern exit
+     6                                  import exit msvcrt.dll
+     7                                  
+     8                                  segment data use32 class=data
+     9                                      ; =================    TASK 2    ====================
+    10                                      ; Some text is given in the data segment. Count how many words there are in it.
+    11                                      ; example given: word1, word2 , word3 ? word 4 -> 5 words
+    12                                      ; ================= FOR GRADE 8  =====================
+    13                                      ; Fix the errors in this code:
+    14                                      ; >>> syntax errors
+    15                                      ; >>> logic errors
+    16                                      ; >>> runtime errors
+    17                                      ;
+    18                                      ; For proper grading, please comment out the line of code with issues and write in the next line the corrected syntax.
+    19                                      ;
+    20                                      ; If easier for you - you can re-write the entire code, using only the instructions from our course:
+    21                                      ; MOV, ADD, SUB, MUL, DIV, IDIV, IMUL, LOOP, JMP, JXX, CMP, LODSB, STOSB, CMPSB, SCASB, MOVSB, AND, OR, XOR, PUSH, POP, CALL
+    22                                      ; If you want to use other instructions - please ask first.
+    23                                      ; ================= FOR GRADE 10 =====================
+    24                                      ; Recommendation: save the code for grade 8 in a separate place before changing the code.
+    25                                      ; Instead of hardcoding the values in the data segments, read the text from a file. The text may be indefinitely long.
+    26                                      ; The count of words will be printed to the console.
+    27                                      
+    28                                      ; As a tip, use indentation and add spaces to separate logic parts of the code
+    29                                      
+    30 00000000 4E6F772C2068657265-         text db "Now, here you go again, You say you want your freedom, Well, who am I to keep you down?",0
+    30 00000009 20796F7520676F2061-
+    30 00000012 6761696E2C20596F75-
+    30 0000001B 2073617920796F7520-
+    30 00000024 77616E7420796F7572-
+    30 0000002D 2066726565646F6D2C-
+    30 00000036 2057656C6C2C207768-
+    30 0000003F 6F20616D204920746F-
+    30 00000048 206B65657020796F75-
+    30 00000051 20646F776E3F00     
+    31                                      len equ $ - text
+    32 00000058 00000000                    result dd 0
+    33                                  
+    34                                  segment code use32 class=code
+    35                                      start:
+    36                                          ;mov ECX, len
+    37 00000000 8B0D58000000                    mov ECX, [len]
+    38 00000006 E327                            jecxz skip_code
+    39                                          ;condition in case of 0 case
+    40                                          
+    41                                          ;moving the adress of the string into edi
+    42 00000008 BF[00000000]                    mov EDI, text 
+    43 0000000D B300                            mov BL, 0
+    44                                          
+    45                                          loop_start:
+    46                                          
+    47                                          ;stosd
+    48 0000000F AA                              stosb
+    49                                          
+    50 00000010 3C61                            cmp AL, 'a'
+    51 00000012 7D04                            jge starts_small_char
+    52                                          
+    53 00000014 3C41                            cmp AL, 'A'
+    54 00000016 7D06                            jge starts_big_char
+    55                                          
+    56                                          starts_small_char:
+    57 00000018 3C7A                            cmp AL, 'z'
+    58 0000001A 7E11                            jle end_if_statements 
+    59                                          
+    60 0000001C EB06                            jmp is_character
+    61                                          
+    62                                          starts_big_char:
+    63 0000001E 3C5A                            cmp AL, 'Z'
+    64 00000020 7D0B                            jge end_if_statements 
+    65                                          
+    66 00000022 EB00                            jmp is_character
+    67                                          
+    68                                          is_character:
+    69                                          ;mov BL, 1
+    70 00000024 8305[58000000]01                add dword[result] ,1
+    71 0000002B EB00                            jmp skip_if 
+    72                                          
+    73                                          end_if_statements:
+    74                                          ;mov BL, 0
+    75                                          skip_if:
+    76 0000002D EBE0                            jmp loop_start
+    77                                          loop_end:
+    78                                         ; mov BL, 0
+    79                                          skip_code:
+    80                                           
+    81 0000002F B8[58000000]                    mov eax,result
+    82                                          ; exit(0)
+    83 00000034 6A00                            push    dword 0      ; push the parameter for exit onto the stack
+    84 00000036 FF15[00000000]                  call    [exit]       ; call exit to terminate the program

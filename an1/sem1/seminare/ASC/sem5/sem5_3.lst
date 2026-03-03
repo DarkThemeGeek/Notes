@@ -1,0 +1,52 @@
+     1                                  bits 32 ; assembling for the 32 bits architecture
+     2                                  
+     3                                  ; declare the EntryPoint (a label defining the very first instruction of the program)
+     4                                  global start        
+     5                                  ;file operations
+     6                                  ;file* fopen(char* filename,char*mode)-'r' 'w' 'rw' 'a'
+     7                                  ;|
+     8                                  ;--> Identifier
+     9                                  ;        void *
+    10                                  ;int fread(char* buffer,int size,int count ,FILE* id) returns numbe of elements
+    11                                  ;char strings
+    12                                  ;fscanf(FILE* id,char*format)
+    13                                  ;fwrite(char*buffer,int size,int count,file* id);
+    14                                  ;fprintf(FILE* filer,char* format,...args)
+    15                                  ;fclose(File* file)
+    16                                  ; declare external functions needed by our program
+    17                                  ;close
+    18                                  extern exit   
+    19                                  extern fopen            ; tell nasm that exit exists even if we won't be defining it
+    20                                  import exit msvcrt.dll
+    21                                  import fopen msvcrt.dll    ; exit is a function that ends the calling process. It is defined in msvcrt.dll
+    22                                                            ; msvcrt.dll contains exit, printf and all the other important C-runtime specific functions
+    23                                  
+    24                                  ; our data is declared here (the variables needed by our program)
+    25                                  segment data use32 class=data
+    26 00000000 <res 000003E8>              a resb 1000
+    27 000003E8 612E696E00                  filename_in db "a.in",0
+    28 000003ED 622E6F757400                filename_out db "b.out",0
+    29 000003F3 00000000                    fin dd 0
+    30 000003F7 00000000                    fout dd 0
+    31 000003FB 00000000                    id_in dd 0
+    32 000003FF 7200                        mode_r db "r",0
+    33 00000401 7700                        mode_w db "w",0
+    34                                  ; our code starts here
+    35                                  segment code use32 class=code
+    36                                      start:
+    37 00000000 68[FF030000]                    push dword mode_r
+    38 00000005 68[E8030000]                    push dword filename_in
+    39 0000000A FF15[00000000]                  call [fopen]
+    40 00000010 83C408                          add esp ,4*2
+    41 00000013 A3[FB030000]                    mov [id_in],eax
+    42 00000018 83F800                          cmp eax,0
+    43 0000001B 740D                            je out_f
+    44 0000001D 50                              push eax
+    45 0000001E 68E8030000                      push dword 1000
+    46 00000023 6A01                            push dword 1
+    47 00000025 68[00000000]                    push dword a
+    48                                      
+    49                                          ; exit(0)
+    50                                          out_f:
+    51 0000002A 6A00                            push    dword 0      ; push the parameter for exit onto the stack
+    52 0000002C FF15[00000000]                  call    [exit]       ; call exit to terminate the program

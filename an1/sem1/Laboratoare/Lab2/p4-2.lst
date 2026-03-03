@@ -1,0 +1,35 @@
+     1                                  ;Multiplications, divisions unsigned
+     2                                  ;a,b,c - byte, d - word
+     3                                  ;d-[3*(a+b+2)-5*(c+2)]
+     4                                  bits 32
+     5                                  global start
+     6                                  extern exit
+     7                                  import exit msvcrt.dll
+     8                                  
+     9                                  segment data use32 class=Data
+    10 00000000 03                      a db 3
+    11 00000001 05                      b db 5
+    12 00000002 06                      c db 6
+    13 00000003 0700                    d dw 7
+    14                                  segment code use32 class=CODE
+    15                                  
+    16                                  start:
+    17 00000000 A0[00000000]            mov al,[a]
+    18 00000005 0205[01000000]          add al,[b]
+    19 0000000B 0402                    add al,2 ;a+b+2
+    20 0000000D B303                    mov bl ,3
+    21 0000000F F6E3                    mul bl
+    22 00000011 6650                    push ax; pushed (a+b+2)*3 on stack
+    23 00000013 A0[02000000]            mov al,[c]
+    24 00000018 0402                    add al,2
+    25 0000001A B305                    mov bl,5
+    26 0000001C F6E3                    mul bl; ax<-5*(c+2)
+    27 0000001E 665B                    pop bx; put bx<- the first paranthesis
+    28 00000020 6629C3                  sub bx,ax ;first p-second p
+    29 00000023 66291D[03000000]        sub [d],bx
+    30 0000002A A1[03000000]            mov eax,[d]
+    31                                  
+    32                                  
+    33                                  
+    34 0000002F 6A00                    push dword 0
+    35 00000031 FF15[00000000]          call[exit]
